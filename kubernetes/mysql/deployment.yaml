@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mysql-deployment
+  name: db-deployment
   labels:
-    app: mysql
+    app: db
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mysql
+      app: db
   template:
     metadata:
       labels:
-        app: mysql
+        app: db
     spec:
       containers:
         - name: mysql
@@ -22,14 +22,23 @@ spec:
           volumeMounts:
             - mountPath: "/var/lib/mysql"
               subPath: "mysql"
-              name: mysql-data
+              name: db-data
           env:
+            - name: MYSQL_DATABASE
+              value: app
+            - name: MYSQL_USER
+              value: app
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql-secrets
+                  name: db-secrets
                   key: ROOT_PASSWORD
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: APP_DB_PASSWORD
       volumes:
-        - name: mysql-data
+        - name: db-data
           persistentVolumeClaim:
-            claimName: mysql-data-disk
+            claimName: db-data-disk

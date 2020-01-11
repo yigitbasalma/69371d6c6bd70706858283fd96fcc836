@@ -17,14 +17,32 @@ spec:
       containers:
         - name: {{ APPLICATION_NAME }}
           image: {{ K8S_IMAGE }}
+          imagePullPolicy: Always
           ports:
             {% for service in K8S_SERVICES.split(";") -%}
             {% set _,port,_=service.split(":") %}
             - containerPort: {{ port.upper() }}
             {%- endfor %}
           env:
+            {% if DATABASE | length > 0 -%}
+            - name: MYSQL_USERNAME
+              value: app
+            - name: MYSQL_INSTANCE_NAME
+              value: app
+            - name: MYSQL_PORT_3306_TCP_PORT
+              value: "3306"
+            - name: MYSQL_PORT_3306_TCP_ADDR
+              value: db-service
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: APP_DB_PASSWORD
+            {% endif -%}
+            {% if K8S_ENV_VARIABLES | length > 0 -%}
             {% for environment in K8S_ENV_VARIABLES.split(";") -%}
             {% set key,value=environment.split(":") %}
             - name: {{ key }}
               value: {{ value }}
             {%- endfor %}
+            {% endif -%}

@@ -23,4 +23,4 @@ RUN pip install gunicorn
 COPY --from=builder /install/lib/python2.7/site-packages /usr/lib/python2.7/site-packages
 COPY app /app
 WORKDIR /app
-CMD ["gunicorn", "-w 4", "application:application"]
+CMD ["gunicorn", "-w 4", "application:application", "-b", "0.0.0.0:3000"]
