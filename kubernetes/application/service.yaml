@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ APPLICATION_NAME }}-service
+spec:
+  selector:
+    app: {{ APPLICATION_NAME }}
+  ports:
+  {% for service in K8S_SERVICES.split(";") -%}
+  {% set protocol,port,target_port=service.split(":") %}
+  - protocol: {{ protocol.upper() }}
+    port: {{ port }}
+    targetPort: {{ target_port }}
+  {%- endfor %}

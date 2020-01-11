@@ -58,6 +58,16 @@ function docker_usability {
     echo -e "Check docker command usability ${GREEN}[OK]${NC}"
 }
 
+function j2_usability {
+    which j2 2>&1 > /dev/null
+    if [ $? -ne 0 ]
+    then
+        echo -e "Check j2 command usability ${RED}[ERROR]${NC}"
+        exit 1
+    fi
+    echo -e "Check j2 command usability ${GREEN}[OK]${NC}"
+}
+
 function prerequisites {
     vagrant_executable
     vagrant_scp_plugin_install
