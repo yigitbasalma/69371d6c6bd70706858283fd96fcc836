@@ -32,7 +32,7 @@ spec:
             - name: MYSQL_PORT_3306_TCP_PORT
               value: "3306"
             - name: MYSQL_PORT_3306_TCP_ADDR
-              value: db-service
+              value: {{ DB_CLUSTER_IP }}
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:

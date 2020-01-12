@@ -74,6 +74,7 @@ function prerequisites {
     ansible_executable
     docker_executable
     docker_usability
+    j2_usability
 }
 
 function vagrant_up {
@@ -86,6 +87,17 @@ function vagrant_up {
     fi
     vagrant scp k8s-master:/home/vagrant/.kube/config /tmp/kube_config 2>&1 >> ${LOG_FILE}
     echo -e "Vagrant up ${GREEN}[OK]${NC}"
+}
+
+function vagrant_destroy {
+    vagrant destroy -f 2>&1 >> ${LOG_FILE}
+    if [ $? -ne 0 ]
+    then
+        echo -e "Vagrant destroy ${RED}[ERROR]${NC}"
+        echo -e "Please see the log file. Path: ${LOG_FILE}"
+        exit 1
+    fi
+    echo -e "Vagrant destroy ${GREEN}[OK]${NC}"
 }
 
 function kubernetes_access_setup {
@@ -111,6 +123,7 @@ function setup {
 
     echo -e "\nJumping to the action. The first step is running the vagrant up command. This could take a few minutes. You can follow all processes belongs to this step with a log file named  ${LOG_FILE}."
     # Run vagrant process
+    vagrant_destroy
     vagrant_up
     kubernetes_access_setup
 }
