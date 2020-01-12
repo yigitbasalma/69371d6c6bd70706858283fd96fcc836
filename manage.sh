@@ -174,6 +174,8 @@ while [[ $# -gt 0 ]]
         shift
         ;;
         *)
+        echo -e "${HELP}"
+        exit 0
         ;;
     esac
 done
