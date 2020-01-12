@@ -29,6 +29,8 @@ Help for ${0};
                 --k8s-image:            Image name for your application container.
             Optional parameters:
                 --db:                   Database software name for your application. [mysql]
+        for bundle-deploy
+            Apply all other options sequentially.
 EOM
 
 function setup_infra {
@@ -42,8 +44,7 @@ function setup_infra {
 }
 
 function build_application {
-    cd docker && \
-        docker build -t ${APPLICATION_NAME}:latest . 1> /dev/null
+    docker build -t ${APPLICATION_NAME}:latest -f docker/Dockerfile docker/ 1> /dev/null &&
     if [ $? -ne 0 ]
     then
         echo -e "Docker image build. ${RED}[ERROR]${NC}"
@@ -53,7 +54,7 @@ function build_application {
 
     if [ ${#REGISTRY} -ne 0 ]
     then
-        docker build -t ${REGISTRY}/${APPLICATION_NAME}:latest . 1> /dev/null && \
+        docker build -t ${REGISTRY}/${APPLICATION_NAME}:latest -f docker/Dockerfile docker/ 1> /dev/null && \
             docker push ${REGISTRY}/${APPLICATION_NAME}:latest
 
         if [ $? -ne 0 ]
@@ -64,6 +65,7 @@ function build_application {
         echo -e "Docker image build for registry. ${GREEN}[OK]${NC}"
 
         K8S_IMAGE=${REGISTRY}/${APPLICATION_NAME}:latest
+        return 0
     fi
 
     K8S_IMAGE=${APPLICATION_NAME}:latest
@@ -83,7 +85,7 @@ function k8s_setup {
         echo -e "Database setup for ${DATABASE}. ${GREEN}[OK]${NC}"
     fi
 
-    mkdir ${SETUP_PREFIX}-${K8S_NAMESPACE} 1> /dev/null && \
+    mkdir ${SETUP_PREFIX}-${K8S_NAMESPACE} && \
         j2 kubernetes/application/service.yaml > ${SETUP_PREFIX}-${K8S_NAMESPACE}/services.yaml && \
         j2 kubernetes/application/deployment.yaml > ${SETUP_PREFIX}-${K8S_NAMESPACE}/deployment.yaml
 

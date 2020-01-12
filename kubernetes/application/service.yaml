@@ -6,6 +6,7 @@ metadata:
 spec:
   selector:
     app: {{ APPLICATION_NAME }}
+  type: NodePort
   ports:
   {% for service in K8S_SERVICES.split(";") -%}
   {% set protocol,port,target_port=service.split(":") %}

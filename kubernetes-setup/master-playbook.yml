@@ -104,7 +104,7 @@
     args:
      warn: no
 
-  - name: Install flannel pod network
+  - name: Apply flannel network plugin
     become: false
     command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
