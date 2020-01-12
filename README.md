@@ -5,7 +5,7 @@ Proje amacı, proje geliştirme sürecinde oluşabilecek karmaşıklıkları en 
 
 ## Bağımlılıklar
 ### j2 Python Komutu
-[Proje](https://www.vagrantup.com/downloads.html)
+Projeye ulaşmak için [buraya](https://www.vagrantup.com/downloads.html) tıklayabilirsiniz.
 
 ## Kullanım
 Uygulamanın bütün kontrolü, "manage.sh" scripti yardımıyla sağlanmaktadır. Örnek kullanım aşağıda gösterilmiştir.
