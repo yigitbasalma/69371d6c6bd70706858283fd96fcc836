@@ -98,7 +98,13 @@ function k8s_setup {
 }
 
 function deploy {
-    kubectl apply -n ${K8S_NAMESPACE} -f ${SETUP_PREFIX}-${K8S_NAMESPACE}/ 1> /dev/null
+    POD_NAME=`kubectl get po -n ${K8S_NAMESPACE} | grep ${APPLICATION_NAME} | awk '{print$1}'`
+    if [ ${#POD_NAME} -eq 0 ]
+    then
+        kubectl apply -n ${K8S_NAMESPACE} -f ${SETUP_PREFIX}-${K8S_NAMESPACE}/ 1> /dev/null
+    else
+        kubectl delete po ${POD_NAME} -n ${K8S_NAMESPACE} 1> /dev/null
+    fi
 
     if [ $? -ne 0 ]
     then

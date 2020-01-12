@@ -15,6 +15,12 @@ Tam kurulum
 ./manage.sh -o bundle-deploy --application-name awsome-app --k8s-namespace awsome-app --k8s-services "tcp:3000:3000" --k8s-env-variables "MYSQL_SCHEMA:awsome-app" --k8s-image yigitbasalma/awsome-app --db mysql --docker-registry yigitbasalma
 ```
 
+Build ve deploy
+```bash
+./manage.sh -o build --application-name awsome-app && \
+    ./manage.sh -o deploy --application-name awsome-app --k8s-namespace awsome-app
+```
+
 Parametreler konusunda detaylı yardım için, aşağıdaki komut çalıştırılabilir. Komut çıktısı örnek olarak verilmiştir.
 ```bash
 [ghost@localhost 69371d6c6bd70706858283fd96fcc836]$ bash manage.sh help
