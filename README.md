@@ -15,10 +15,11 @@ Tam kurulum
 ./manage.sh -o bundle-deploy --application-name awsome-app --k8s-namespace awsome-app --k8s-services "tcp:3000:3000" --k8s-env-variables "MYSQL_SCHEMA:awsome-app" --k8s-image yigitbasalma/awsome-app --db mysql --docker-registry yigitbasalma
 ```
 
+##### Not: Kurulum sonrasında kubernetes master "192.168.40.20", node-1 "192.168.40.31" adresinde çalışacaktır.
+
 Build ve deploy
 ```bash
-./manage.sh -o build --application-name awsome-app && \
-    ./manage.sh -o deploy --application-name awsome-app --k8s-namespace awsome-app
+./manage.sh -o deploy --application-name awsome-app --docker-registry yigitbasalma --k8s-namespace awsome-app
 ```
 
 Parametreler konusunda detaylı yardım için, aşağıdaki komut çalıştırılabilir. Komut çıktısı örnek olarak verilmiştir.
