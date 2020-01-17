@@ -217,6 +217,12 @@ case ${OPERATION} in
         echo -e "${RED}[ERROR]${NC} You should run k8s-setup option before this."
         exit 1
     fi
+    if [ ${#APPLICATION_NAME} -eq 0 ]
+    then
+        echo -e "${RED}[ERROR]${NC} You should give an application name with --application-name parameter."
+        exit 1
+    fi
+    build_application
     deploy
     ;;
     bundle-deploy)
