@@ -10,7 +10,6 @@ Projeye ulaşmak için [buraya](https://www.vagrantup.com/downloads.html) tıkla
 ## Kullanım
 Uygulamanın bütün kontrolü, "manage.sh" scripti yardımıyla sağlanmaktadır. Örnek kullanım aşağıda gösterilmiştir.
 
-
 Tam kurulum
 ```bash
 ./manage.sh -o bundle-deploy --application-name awsome-app --k8s-namespace awsome-app --k8s-services "tcp:3000:3000" --k8s-env-variables "MYSQL_SCHEMA:awsome-app" --k8s-image yigitbasalma/awsome-app --db mysql --docker-registry yigitbasalma
