@@ -70,7 +70,7 @@
       state: present
       filename: kubernetes.list
 
-  - name: Install Kubernetes binaries
+  - name: Install Kubernetes binaries.
     apt:
       name: "{{ packages }}"
       state: present
