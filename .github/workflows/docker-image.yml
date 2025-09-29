@@ -1,0 +1,51 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+
+  guard-and-delete:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR conditions
+        id: gate
+        run: |
+          BASE="${{ github.base_ref }}"
+          HEAD="${{ github.head_ref }}"
+
+          echo "Base: $BASE"
+          echo "Head: $HEAD"
+
+          if [[ "$BASE" == "dev" && "$HEAD" == feat/* ]]; then
+            echo "allowed=true" >> $GITHUB_OUTPUT
+          else
+            echo "allowed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Delete this workflow run if not allowed
+        if: steps.gate.outputs.allowed == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const run_id = context.runId;
+            await github.rest.actions.deleteWorkflowRun({ owner, repo, run_id });
+            core.info(`Run ${run_id} discarded (PR does not match rules).`);
+
+  build:
+
+    runs-on: ubuntu-latest
+    needs: guard-and-delete
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
