@@ -6,14 +6,12 @@ on:
   pull_request:
     branches: [ "master" ]
 
-permissions:
-  actions: write
-  contents: read
-
 jobs:
 
   guard-and-delete:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     steps:
       - name: Check PR conditions
         id: gate
