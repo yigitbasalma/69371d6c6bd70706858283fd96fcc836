@@ -93,7 +93,7 @@
       state: restarted
 
   - name: Initialize the Kubernetes cluster using kubeadm
-    command: kubeadm init --apiserver-advertise-address="192.168.56.20" --apiserver-cert-extra-sans="192.168.56.20"  --node-name k8s-master --pod-network-cidr=10.244.0.0/16
+    command: kubeadm init --apiserver-advertise-address="192.168.40.20" --apiserver-cert-extra-sans="192.168.40.20"  --node-name k8s-master --pod-network-cidr=10.244.0.0/16
 
   - name: Setup kubeconfig for vagrant user
     command: "{{ item }}"
@@ -113,4 +113,5 @@
     register: join_command
 
   - name: Copy join command to local file
+    become: false
     local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./join-command"

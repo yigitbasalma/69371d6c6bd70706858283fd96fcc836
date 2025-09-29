@@ -27,6 +27,11 @@ Help for ${0};
                 --k8s-services:         Application services. Syntax: "protocol:port:target-port;..."
                 --k8s-env-variables:    Environment variables for application container. Syntax: "key:value;..."
                 --k8s-image:            Image name for your application container.
+        for deploy
+            Deploy prepared yaml files to the project namespace
+            Parameters
+                --application-name:     Application name for deployment.
+                --k8s-namespace:        Namespace for your environment.
             Optional parameters:
                 --db:                   Database software name for your application. [mysql]
         for bundle-deploy
@@ -72,10 +77,12 @@ function build_application {
 }
 
 function k8s_setup {
-    kubectl create ns ${K8S_NAMESPACE} 1> /dev/null
+    kubectl create ns ${K8S_NAMESPACE} 2>&1 > /dev/null || echo -e "Namespace already exists. ${GREEN}[OK]${NC}"
+
     if [[ ${#DATABASE} -ne 0 && -d kubernetes/${DATABASE} ]]
     then
-        kubectl apply -n ${K8S_NAMESPACE} -f kubernetes/${DATABASE}/ 1> /dev/null
+        kubectl apply -n ${K8S_NAMESPACE} -f kubernetes/${DATABASE}/ 1> /dev/null && \
+            export DB_CLUSTER_IP=`kubectl get service/db-service -o jsonpath='{.spec.clusterIP}' -n ${K8S_NAMESPACE}`
 
         if [ $? -ne 0 ]
         then
@@ -85,8 +92,14 @@ function k8s_setup {
         echo -e "Database setup for ${DATABASE}. ${GREEN}[OK]${NC}"
     fi
 
-    mkdir ${SETUP_PREFIX}-${K8S_NAMESPACE} && \
-        j2 kubernetes/application/service.yaml > ${SETUP_PREFIX}-${K8S_NAMESPACE}/services.yaml && \
+    if [ ${#K8S_ENV_VARIABLES} -eq 0 ]
+    then
+        export K8S_ENV_VARIABLES=""
+    fi
+
+    if [ ! -d ${SETUP_PREFIX}-${K8S_NAMESPACE} ];then mkdir ${SETUP_PREFIX}-${K8S_NAMESPACE}; fi
+
+    j2 kubernetes/application/service.yaml > ${SETUP_PREFIX}-${K8S_NAMESPACE}/services.yaml && \
         j2 kubernetes/application/deployment.yaml > ${SETUP_PREFIX}-${K8S_NAMESPACE}/deployment.yaml
 
     if [ $? -ne 0 ]
@@ -186,9 +199,9 @@ case ${OPERATION} in
     build_application
     ;;
     k8s-setup)
-    if [[ ${#K8S_NAMESPACE} -eq 0 || ${#K8S_SERVICES} -eq 0 || ${#K8S_ENV_VARIABLES} -eq 0 || ${#K8S_IMAGE} -eq 0 || ${#APPLICATION_NAME} -eq 0 ]]
+    if [[ ${#K8S_NAMESPACE} -eq 0 || ${#K8S_SERVICES} -eq 0 || ${#K8S_IMAGE} -eq 0 || ${#APPLICATION_NAME} -eq 0 ]]
     then
-        echo -e "${RED}[ERROR]${NC} You should give following parameters. --application-name, --k8s-namespace, --k8s-services, --k8s-env-variables, --k8s-image."
+        echo -e "${RED}[ERROR]${NC} You should give following parameters. --application-name, --k8s-namespace, --k8s-services, --k8s-image."
         exit 1
     fi
     k8s_setup
@@ -204,6 +217,12 @@ case ${OPERATION} in
         echo -e "${RED}[ERROR]${NC} You should run k8s-setup option before this."
         exit 1
     fi
+    if [ ${#APPLICATION_NAME} -eq 0 ]
+    then
+        echo -e "${RED}[ERROR]${NC} You should give an application name with --application-name parameter."
+        exit 1
+    fi
+    build_application
     deploy
     ;;
     bundle-deploy)
@@ -219,9 +238,9 @@ case ${OPERATION} in
     build_application
 
     # k8s-setup
-    if [[ ${#K8S_NAMESPACE} -eq 0 || ${#K8S_SERVICES} -eq 0 || ${#K8S_ENV_VARIABLES} -eq 0 || ${#K8S_IMAGE} -eq 0 || ${#APPLICATION_NAME} -eq 0 ]]
+    if [[ ${#K8S_NAMESPACE} -eq 0 || ${#K8S_SERVICES} -eq 0 || ${#K8S_IMAGE} -eq 0 || ${#APPLICATION_NAME} -eq 0 ]]
     then
-        echo -e "${RED}[ERROR]${NC} You should give following parameters. --application-name, --k8s-namespace, --k8s-services, --k8s-env-variables, --k8s-image."
+        echo -e "${RED}[ERROR]${NC} You should give following parameters. --application-name, --k8s-namespace, --k8s-services, --k8s-image."
         exit 1
     fi
     k8s_setup
